@@ -1,13 +1,19 @@
-import React from 'react'
-
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Landing from "./Pages/Landing";
+import Auth from "./Pages/Auth";
 
 function App() {
-
   return (
     <>
-      <h1 className='text-red-500'>Serenity</h1>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/auth" element={<Auth />} />
+        </Routes>
+      </Router>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
