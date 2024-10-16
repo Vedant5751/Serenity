@@ -10,13 +10,13 @@ export default function About() {
               <div class="pt-24 lg:justify-center sm:justify-end justify-start items-start gap-2.5 flex">
                 <img
                   class="rounded-xl object-cover"
-                  src="https://example.com/mental-health-image1.png"
+                  src=""
                   alt="About Serenity"
                 />
               </div>
               <img
                 class="sm:ml-0 ml-auto rounded-xl object-cover"
-                src="https://example.com/mental-health-image2.png"
+                src=""
                 alt="Mental Health Support"
               />
             </div>
@@ -84,7 +84,7 @@ export default function About() {
             </div>
             <img
               class="lg:mx-0 mx-auto h-full rounded-3xl object-cover"
-              src="https://example.com/mental-health-image3.png"
+              src=""
               alt="Mental Health Resources"
             />
           </div>
@@ -109,7 +109,7 @@ export default function About() {
             </div>
             <img
               class="lg:mx-0 mx-auto h-full rounded-3xl object-cover"
-              src="https://example.com/mental-health-image4.png"
+              src=""
               alt="Virtual Therapy"
             />
           </div>
