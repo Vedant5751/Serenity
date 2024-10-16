@@ -18,9 +18,6 @@ export default function Hero() {
           <button href="/getstarted" className="px-4 py-2 bg-slate-500 hover:bg-blue-700 transition duration-200 rounded-lg text-white shadow-[0px_2px_0px_0px_#FFFFFF40_inset]">
             Get Started
           </button>
-          <button href="/learnmore" className="px-4 py-2 bg-slate-500 hover:bg-blue-700 transition duration-200 rounded-lg text-white shadow-[0px_2px_0px_0px_#FFFFFF40_inset]">
-            Learn More
-          </button>
         </div>
       </Vortex>
     </div>
