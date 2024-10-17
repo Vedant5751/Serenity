@@ -1,15 +1,53 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { CognitoUser, AuthenticationDetails } from "amazon-cognito-identity-js"; // Import AuthenticationDetails
+import { userPool } from "../aws-config"; // Import your user pool configuration
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(""); // State for error messages
+  const [loading, setLoading] = useState(false); // Loading state
+  const navigate = useNavigate(); // Hook to programmatically navigate
+
+  const handleSignIn = (e) => {
+    e.preventDefault(); // Prevent default form submission
+    setLoading(true); // Set loading state to true
+
+    const user = new CognitoUser({
+      Username: email,
+      Pool: userPool,
+    });
+
+    // Create AuthenticationDetails object
+    const authDetails = new AuthenticationDetails({
+      Username: email,
+      Password: password,
+    });
+
+    // Call authenticateUser with the authDetails object
+    user.authenticateUser(authDetails, {
+      onSuccess: (result) => {
+        setLoading(false); // Reset loading state
+        setError(""); // Clear error message
+        // Redirect to a protected route (e.g., dashboard)
+        navigate("/dashboard");
+      },
+      onFailure: (err) => {
+        setLoading(false); // Reset loading state
+        setError(err.message || JSON.stringify(err)); // Set error message
+      },
+    });
+  };
 
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
         <h2 className="text-3xl font-bold text-center">Sign In</h2>
-
-        <form className="space-y-4">
+        {error && <div className="text-red-500">{error}</div>}{" "}
+        {/* Display error message */}
+        <form className="space-y-4" onSubmit={handleSignIn}>
           <div>
             <label
               htmlFor="email"
@@ -23,6 +61,8 @@ export default function SignIn() {
               type="email"
               required
               placeholder="helloworld@email.com"
+              value={email} // Controlled input
+              onChange={(e) => setEmail(e.target.value)} // Handle change
               className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600"
             />
           </div>
@@ -39,6 +79,8 @@ export default function SignIn() {
               name="password"
               type={showPassword ? "text" : "password"}
               required
+              value={password} // Controlled input
+              onChange={(e) => setPassword(e.target.value)} // Handle change
               className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600"
             />
             <div className="flex items-center mt-2">
@@ -62,22 +104,25 @@ export default function SignIn() {
                 Keep me signed in
               </label>
             </div>
-            <a
-              href="#"
+            <Link
+              to="/forgot-password"
               className="text-sm font-medium text-green-600 hover:underline"
             >
               Forgot Password?
-            </a>
+            </Link>
           </div>
 
           <button
             type="submit"
-            className="w-full py-2 px-4 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className={`w-full py-2 px-4 ${
+              loading ? "bg-gray-400" : "bg-green-600"
+            } text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500`}
+            disabled={loading} // Disable button while loading
           >
-            Sign In
+            {loading ? "Signing In..." : "Sign In"}{" "}
+            {/* Change button text based on loading state */}
           </button>
         </form>
-
         <div className="text-center mt-6">
           <p className="text-sm text-gray-600">
             Don't have an account?{" "}
