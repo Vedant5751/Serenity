@@ -1,4 +1,3 @@
-import AWS from "aws-sdk";
 import { CognitoUserPool } from "amazon-cognito-identity-js";
 
 const poolData = {
@@ -8,7 +7,11 @@ const poolData = {
 
 export const userPool = new CognitoUserPool(poolData);
 
-// Optionally configure AWS SDK
-AWS.config.update({
-  region: "eu-north-1", // e.g. 'us-east-1'
-});
+// Dynamically import AWS SDK
+export const getAWS = async () => {
+  const AWS = await import('aws-sdk');
+  AWS.config.update({
+    region: "eu-north-1", // e.g. 'us-east-1'
+  });
+  return AWS;
+};
