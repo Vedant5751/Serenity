@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
@@ -6,37 +7,7 @@ export default function SignIn() {
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-3xl font-bold text-center">Welcome back</h2>
-
-        <div className="space-y-4">
-          <button className="w-full bg-white border border-gray-300 rounded-lg flex justify-center items-center py-2 space-x-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-            <img
-              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-              alt="Google"
-              className="w-5 h-5"
-            />
-            <span>Sign in with Google</span>
-          </button>
-          <button className="w-full bg-white border border-gray-300 rounded-lg flex justify-center items-center py-2 space-x-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-            <img
-              src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-              alt="GitHub"
-              className="w-5 h-5"
-            />
-            <span>Sign in with GitHub</span>
-          </button>
-        </div>
-
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="bg-white px-2 text-gray-500">
-              Or, sign in with your email
-            </span>
-          </div>
-        </div>
+        <h2 className="text-3xl font-bold text-center">Sign In</h2>
 
         <form className="space-y-4">
           <div>
@@ -110,9 +81,9 @@ export default function SignIn() {
         <div className="text-center mt-6">
           <p className="text-sm text-gray-600">
             Don't have an account?{" "}
-            <a href="/signup" className="text-green-600 hover:underline">
+            <Link to="/signup" className="text-green-600 hover:underline">
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
       </div>
