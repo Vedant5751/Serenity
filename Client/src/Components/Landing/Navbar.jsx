@@ -3,6 +3,22 @@ import React, { useState, useEffect } from "react";
 export default function Navbar() {
   // State to manage dark mode
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+    console.log("Menu Toggled");
+  };
+
+  const scrollTo = (elementId, event) => {
+    event.preventDefault();
+    const element = document.getElementById(elementId);
+    if (element) {
+      const yOffset = -60;
+      const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
 
   // On component mount, check if dark mode was previously enabled
   useEffect(() => {
@@ -36,7 +52,15 @@ export default function Navbar() {
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 items-center justify-between">
               <div className="flex items-center">
-                <div className="h4 ml-2 font-bold">Serenity</div>
+                <div className="h4 ml-2 font-bold text-2xl">
+                  <a
+                    href="#"
+                    onClick={(e) => scrollTo("home", e)}
+                  >
+                    Serenity
+                  </a>
+                  
+                </div>
                 <nav className="ml-10 hidden md:block" aria-label="Main menu">
                   <nav
                     aria-label="Main"
@@ -51,9 +75,9 @@ export default function Navbar() {
                         dir="ltr"
                       >
                         <a
+                          href="#"
+                          onClick={(e) => scrollTo("about", e)}
                           className="group inline-flex h-10 w-max items-center justify-center rounded-full bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-secondary-300/10 hover:bg-gray-300/20 hover:text-accent-foreground focus:bg-secondary-300/10 focus:text-accent-foreground focus:outline-none"
-                          target="_self"
-                          href="/about"
                         >
                           About Us
                         </a>
@@ -65,9 +89,9 @@ export default function Navbar() {
                           Pricing
                         </a>
                         <a
+                          href="#"
+                          onClick={(e) => scrollTo("footer", e)}
                           className="group inline-flex h-10 w-max items-center justify-center rounded-full bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-secondary-300/10 hover:bg-gray-300/20 hover:text-accent-foreground focus:bg-secondary-300/10 focus:text-accent-foreground focus:outline-none"
-                          target="_blank"
-                          href="/contact"
                         >
                           Contact
                         </a>
@@ -151,6 +175,7 @@ export default function Navbar() {
               <div className="md:hidden">
                 <div className="md:hidden">
                   <button
+                    onClick={toggleMenu}
                     className="inline-flex items-center gap-2 justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:text-accent-foreground h-10 w-10 rounded-md hover:bg-secondary-300/10"
                     type="button"
                     data-state="closed"
