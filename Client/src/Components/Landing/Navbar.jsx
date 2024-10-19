@@ -83,10 +83,10 @@ export default function Navbar() {
                         </a>
                         <a
                           className="group inline-flex h-10 w-max items-center justify-center rounded-full bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-secondary-300/10 hover:bg-gray-300/20 hover:text-accent-foreground focus:bg-secondary-300/10 focus:text-accent-foreground focus:outline-none"
-                          target="_self"
-                          href="/pricing"
+                          target="_blank"
+                          href="https://github.com/Vedant5751/Serenity"
                         >
-                          Pricing
+                          GitHub
                         </a>
                         <a
                           href="#"

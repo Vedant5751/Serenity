@@ -10,13 +10,13 @@ export default function About() {
               <div className="pt-24 lg:justify-center sm:justify-end justify-start items-start gap-2.5 flex">
                 <img
                   className="rounded-xl object-cover"
-                  src=""
+                  src="/Resource.svg"
                   alt="About Serenity"
                 />
               </div>
               <img
                 className="sm:ml-0 ml-auto rounded-xl object-cover"
-                src=""
+                src="/health-service.svg"
                 alt="Mental Health Support"
               />
             </div>
@@ -84,7 +84,7 @@ export default function About() {
             </div>
             <img
               className="lg:mx-0 mx-auto h-full rounded-3xl object-cover"
-              src=""
+              src="/mental-health.svg"
               alt="Mental Health Resources"
             />
           </div>
@@ -109,7 +109,7 @@ export default function About() {
             </div>
             <img
               className="lg:mx-0 mx-auto h-full rounded-3xl object-cover"
-              src=""
+              src="/health-service.svg"
               alt="Virtual Therapy"
             />
           </div>

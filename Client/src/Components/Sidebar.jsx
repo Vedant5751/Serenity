@@ -17,17 +17,14 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion"; 
 import { cn } from "/src/lib/utils";
-import { userPool } from "../aws-config";
-import { useAuth } from "../context/AuthContext";
+
 
 export default function SidebarDemo() {
   const navigate = useNavigate();
-  const { logout, checkAuthStatus } = useAuth();
 
   const handleLogout = () => {
-    logout();
-    checkAuthStatus(); // Add this line to update the auth status
-    navigate("/signin");
+    localStorage.removeItem("isAuthenticated"); // Clear authentication status
+    navigate("/signin"); // Redirect to sign-in page
   };
 
   const links = [
@@ -158,3 +155,4 @@ export const LogoIcon = () => {
     </Link>
   );
 };
+

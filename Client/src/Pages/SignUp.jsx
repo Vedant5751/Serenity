@@ -1,6 +1,13 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { CognitoUserPool } from 'amazon-cognito-identity-js';
 
+const poolData = {
+  UserPoolId: import.meta.env.VITE_USER_POOL_ID, // Use Vite environment variable
+  ClientId: import.meta.env.VITE_CLIENT_ID, // Use Vite environment variable
+};
+
+const userPool = new CognitoUserPool(poolData);
 
 export default function SignUp() {
   const [name, setName] = useState(""); // State for name
@@ -10,8 +17,40 @@ export default function SignUp() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false); // State for terms acceptance
+  const navigate = useNavigate();
 
+  const handleSignUp = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    const attributeList = [
+      {
+        Name: 'email',
+        Value: email,
+      },
+      {
+        Name: 'name',
+        Value: name,
+      },
+    ];
+
+    userPool.signUp(email, password, attributeList, null, (err, data) => {
+      if (err) {
+        setError(err.message);
+        setLoading(false);
+        return;
+      }
+      console.log('Sign up successful:', data);
+      navigate("/confirm-email"); // Redirect to confirmation page
+    });
+  };
 
   return (
     <div className="flex justify-center items-center h-screen">
