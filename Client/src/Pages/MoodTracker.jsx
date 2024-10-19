@@ -327,7 +327,9 @@ const MoodTracker = () => {
                       onClick={(value) => {
                         if (value) {
                           alert(
-                            `Mood on ${value.date.toDateString()}: ${value.count}`
+                            `Mood on ${value.date.toDateString()}: ${
+                              value.count
+                            }`
                           );
                         }
                       }}

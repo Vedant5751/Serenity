@@ -5,10 +5,11 @@ import Landing from "./Pages/Landing";
 import SignUp from "./Pages/SignUp";
 import SignIn from "./Pages/SignIn";
 import ConfirmEmail from "./Pages/ConfirmEmail"; 
+import ProtectedRoute from "./Components/ProtectedRoute";
 import Dashboard from "./Pages/Dashboard";
 import MoodTracker from "./Pages/MoodTracker";
-import ProtectedRoute from "./Components/ProtectedRoute"; // Import the ProtectedRoute component
-
+import ResourceLibrary from "./Pages/ResourceLibrary";
+import VirtualTherapySessions from "./Pages/VirtualTherapy";
 function App() {
   const isAuthenticated = localStorage.getItem("isAuthenticated") === "true"; // Check authentication status
 
@@ -32,6 +33,22 @@ function App() {
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
               <MoodTracker />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/resource-library" 
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ResourceLibrary />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/virtual-therapy" 
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <VirtualTherapySessions />
             </ProtectedRoute>
           } 
         />
