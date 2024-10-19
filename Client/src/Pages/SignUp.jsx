@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { userPool } from "../aws-config"; // Import your user pool configuration
+import { Link } from "react-router-dom";
+
 
 export default function SignUp() {
   const [name, setName] = useState(""); // State for name
@@ -10,28 +10,8 @@ export default function SignUp() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false); // State for terms acceptance
-  const navigate = useNavigate();
 
-  const handleSignUp = (e) => {
-    e.preventDefault();
-    setLoading(true);
 
-    userPool.signUp(
-      email,
-      password,
-      [{ Name: "name", Value: name }],
-      null,
-      (err, result) => {
-        setLoading(false);
-        if (err) {
-          setError(err.message || JSON.stringify(err));
-        } else {
-          // Redirect to confirmation page
-          navigate("/confirm");
-        }
-      }
-    );
-  };
 
   return (
     <div className="flex justify-center items-center h-screen">

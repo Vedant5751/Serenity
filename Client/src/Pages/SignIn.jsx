@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { CognitoUser, AuthenticationDetails } from "amazon-cognito-identity-js"; // Import AuthenticationDetails
-import { userPool } from "../aws-config"; // Import your user pool configuration
-import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
@@ -10,37 +7,11 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(""); // State for error messages
   const [loading, setLoading] = useState(false); // Loading state
-  const navigate = useNavigate(); // Hook to programmatically navigate
-  const { login, checkAuthStatus } = useAuth();
+
 
   const handleSignIn = (e) => {
     e.preventDefault(); // Prevent default form submission
     setLoading(true); // Set loading state
-
-    const user = new CognitoUser({
-      Username: email,
-      Pool: userPool,
-    });
-
-    // Create AuthenticationDetails object
-    const authDetails = new AuthenticationDetails({
-      Username: email,
-      Password: password,
-    });
-
-    // Call authenticateUser with the authDetails object
-    user.authenticateUser(authDetails, {
-      onSuccess: (result) => {
-        setLoading(false); // Reset loading state
-        setError(""); // Clear error message
-        login();
-        navigate("/dashboard");
-      },
-      onFailure: (err) => {
-        setLoading(false); // Reset loading state
-        setError(err.message || JSON.stringify(err)); // Set error message
-      },
-    });
   };
 
   return (
