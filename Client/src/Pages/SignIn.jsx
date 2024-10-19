@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CognitoUser, AuthenticationDetails } from "amazon-cognito-identity-js"; // Import AuthenticationDetails
 import { userPool } from "../aws-config"; // Import your user pool configuration
+import { useAuth } from "../context/AuthContext";
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
@@ -10,10 +11,11 @@ export default function SignIn() {
   const [error, setError] = useState(""); // State for error messages
   const [loading, setLoading] = useState(false); // Loading state
   const navigate = useNavigate(); // Hook to programmatically navigate
+  const { login, checkAuthStatus } = useAuth();
 
   const handleSignIn = (e) => {
     e.preventDefault(); // Prevent default form submission
-    setLoading(true); // Set loading state to true
+    setLoading(true); // Set loading state
 
     const user = new CognitoUser({
       Username: email,
@@ -31,7 +33,7 @@ export default function SignIn() {
       onSuccess: (result) => {
         setLoading(false); // Reset loading state
         setError(""); // Clear error message
-        // Redirect to a protected route (e.g., dashboard)
+        login();
         navigate("/dashboard");
       },
       onFailure: (err) => {

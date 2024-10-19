@@ -7,6 +7,7 @@ import ConfirmUser from "./Pages/ConfirmUser";
 import SignIn from "./Pages/SignIn";
 import PrivateRoute from "./Components/PrivateRoute";
 import Dashboard from "./Pages/Dashboard";
+import MoodTracker from "./Pages/MoodTracker";
 
 function App() {
   return (
@@ -21,6 +22,14 @@ function App() {
           element={
             <PrivateRoute>
               <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/moodtracker"
+          element={
+            <PrivateRoute>
+              <MoodTracker />
             </PrivateRoute>
           }
         />

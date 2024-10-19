@@ -14,22 +14,33 @@ import {
   IconBell,
   IconLifebuoy,
 } from "@tabler/icons-react"; // Additional icons for new items
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion"; 
 import { cn } from "/src/lib/utils";
+import { userPool } from "../aws-config";
+import { useAuth } from "../context/AuthContext";
 
 export default function SidebarDemo() {
+  const navigate = useNavigate();
+  const { logout, checkAuthStatus } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    checkAuthStatus(); // Add this line to update the auth status
+    navigate("/signin");
+  };
+
   const links = [
     {
       label: "Dashboard",
-      href: "#",
+      href: "/dashboard",
       icon: (
         <IconBrandTabler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
     },
     {
       label: "Mood Tracker",
-      href: "#",
+      href: "/moodtracker",
       icon: (
         <IconMoodSmile className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
@@ -75,10 +86,12 @@ export default function SidebarDemo() {
       icon: (
         <IconArrowLeft className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
+      onClick: handleLogout,
     },
   ];
 
   const [open, setOpen] = useState(false);
+
   return (
     <div
       className={cn(
@@ -145,4 +158,3 @@ export const LogoIcon = () => {
     </Link>
   );
 };
-

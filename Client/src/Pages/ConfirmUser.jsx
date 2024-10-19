@@ -33,7 +33,7 @@ export default function ConfirmUser() {
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-3xl font-bold text-center">Confirm Your Account</h2>
+        <h2 className="text-3xl font-bold text-center">Verification Code Sent to Your Email. Please Enter the Code Below.</h2>
         {error && <div className="text-red-500">{error}</div>}
         <form className="space-y-4" onSubmit={handleConfirm}>
           <div>
