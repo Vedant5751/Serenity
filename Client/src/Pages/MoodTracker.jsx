@@ -1,78 +1,72 @@
-import React, { useState, useEffect } from 'react';
-import { Line, Pie, Bar, Radar } from 'react-chartjs-2';
-import { Chart as ChartJS, registerables } from 'chart.js';
-import CalendarHeatmap from 'react-calendar-heatmap';
-import 'react-calendar-heatmap/dist/styles.css';
+import React, { useState, useEffect } from "react";
+import { Line, Pie, Bar, Radar } from "react-chartjs-2";
+import { Chart as ChartJS, registerables } from "chart.js";
+import CalendarHeatmap from "react-calendar-heatmap";
+import "react-calendar-heatmap/dist/styles.css";
 import SidebarDemo from "../Components/Sidebar";
-import UserPreferences from '../Components/UserPreferences'; // Adjust the path as necessary
-import MoodInsights from '../Components/MoodInsights'; // Adjust the path as necessary
+import UserPreferences from "../Components/UserPreferences";
+import { db } from "../firebase"; 
+import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import { CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js'; // Import CognitoUser and CognitoUserPool
+
+const poolData = {
+  UserPoolId: import.meta.env.VITE_USER_POOL_ID,
+  ClientId: import.meta.env.VITE_CLIENT_ID,
+};
+
+const userPool = new CognitoUserPool(poolData);
 
 ChartJS.register(...registerables);
 
 const MoodTracker = () => {
   const [moodData, setMoodData] = useState([]);
   const [selectedMood, setSelectedMood] = useState(null);
-  const [moodNote, setMoodNote] = useState('');
-  const [dateRange, setDateRange] = useState('week');
-  const [selectedTag, setSelectedTag] = useState('');
-  const [displayedCharts, setDisplayedCharts] = useState(['line', 'pie']);
-  const [userPreferences, setUserPreferences] = useState({
-    defaultCharts: ['line', 'pie'],
-    showAverages: true,
-    showTrendlines: true,
-  });
+  const [moodNote, setMoodNote] = useState("");
+  const [dateRange, setDateRange] = useState("week");
+  const [selectedTag, setSelectedTag] = useState("");
+  const [userId, setUserId] = useState(null); // Initialize userId as null
+
   const [moodAverages, setMoodAverages] = useState({
     daily: 0,
     weekly: 0,
     monthly: 0,
   });
   const [customTags, setCustomTags] = useState([]);
+  const [userPreferences, setUserPreferences] = useState({
+    showTrendlines: false,
+    showAverages: false,
+    defaultCharts: ["line", "pie"], // Example default charts
+  });
 
   // Mood entry buttons
   const moodOptions = [
-    { value: 1, label: 'Very Sad', emoji: '😢' },
-    { value: 2, label: 'Sad', emoji: '🙁' },
-    { value: 3, label: 'Neutral', emoji: '😐' },
-    { value: 4, label: 'Happy', emoji: '🙂' },
-    { value: 5, label: 'Very Happy', emoji: '😄' },
+    { value: 1, label: "Very Sad", emoji: "😢" },
+    { value: 2, label: "Sad", emoji: "🙁" },
+    { value: 3, label: "Neutral", emoji: "😐" },
+    { value: 4, label: "Happy", emoji: "🙂" },
+    { value: 5, label: "Very Happy", emoji: "😄" },
   ];
 
   const handleMoodSelect = (mood) => {
     setSelectedMood(mood);
   };
 
-  const handleMoodSubmit = () => {
-    if (selectedMood) {
-      const tags = moodNote.match(/#\w+/g) || [];
-      const newCustomTags = tags.filter(tag => !customTags.includes(tag));
-      
-      const newMoodEntry = {
-        date: new Date(),
-        mood: selectedMood,
-        note: moodNote,
-        tags: tags,
-      };
-      setMoodData([...moodData, newMoodEntry]);
-      setCustomTags([...customTags, ...newCustomTags]);
-      setSelectedMood(null);
-      setMoodNote('');
-    }
-  };
-
   // Filter functions
   const filterMoodData = () => {
     let filteredData = moodData;
-    if (dateRange === 'week') {
+    if (dateRange === "week") {
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      filteredData = filteredData.filter(entry => entry.date >= oneWeekAgo);
-    } else if (dateRange === 'month') {
+      filteredData = filteredData.filter((entry) => entry.date >= oneWeekAgo);
+    } else if (dateRange === "month") {
       const oneMonthAgo = new Date();
       oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-      filteredData = filteredData.filter(entry => entry.date >= oneMonthAgo);
+      filteredData = filteredData.filter((entry) => entry.date >= oneMonthAgo);
     }
     if (selectedTag) {
-      filteredData = filteredData.filter(entry => entry.tags.includes(selectedTag));
+      filteredData = filteredData.filter((entry) =>
+        entry.tags.includes(selectedTag)
+      );
     }
     return filteredData;
   };
@@ -81,33 +75,35 @@ const MoodTracker = () => {
   const prepareLineChartData = () => {
     const filteredData = filterMoodData();
     const data = {
-      labels: filteredData.map(entry => entry.date.toLocaleDateString()),
-      datasets: [{
-        label: 'Mood',
-        data: filteredData.map(entry => entry.mood.value),
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1
-      }]
+      labels: filteredData.map((entry) => entry.date.toLocaleDateString()), // Ensure date is a Date object
+      datasets: [
+        {
+          label: "Mood",
+          data: filteredData.map((entry) => entry.mood.value),
+          borderColor: "rgb(75, 192, 192)",
+          tension: 0.1,
+        },
+      ],
     };
 
     if (userPreferences.showTrendlines) {
       const trendlineData = calculateTrendline(filteredData);
       data.datasets.push({
-        label: 'Trendline',
+        label: "Trendline",
         data: trendlineData,
-        borderColor: 'rgba(255, 99, 132, 0.5)',
+        borderColor: "rgba(255, 99, 132, 0.5)",
         borderDash: [5, 5],
-        fill: false
+        fill: false,
       });
     }
 
     if (userPreferences.showAverages) {
       data.datasets.push({
-        label: 'Weekly Average',
+        label: "Weekly Average",
         data: new Array(filteredData.length).fill(moodAverages.weekly),
-        borderColor: 'rgba(54, 162, 235, 0.5)',
+        borderColor: "rgba(54, 162, 235, 0.5)",
         borderDash: [10, 5],
-        fill: false
+        fill: false,
       });
     }
 
@@ -131,47 +127,86 @@ const MoodTracker = () => {
   const preparePieChartData = () => {
     const filteredData = filterMoodData();
     const moodCounts = moodOptions.reduce((acc, mood) => {
-      acc[mood.label] = filteredData.filter(entry => entry.mood.value === mood.value).length;
+      acc[mood.label] = filteredData.filter(
+        (entry) => entry.mood.value === mood.value
+      ).length;
       return acc;
     }, {});
 
     return {
       labels: Object.keys(moodCounts),
-      datasets: [{
-        data: Object.values(moodCounts),
-        backgroundColor: [
-          '#FF6384',
-          '#36A2EB',
-          '#FFCE56',
-          '#4BC0C0',
-          '#9966FF'
-        ]
-      }]
+      datasets: [
+        {
+          data: Object.values(moodCounts),
+          backgroundColor: [
+            "#FF6384",
+            "#36A2EB",
+            "#FFCE56",
+            "#4BC0C0",
+            "#9966FF",
+          ],
+        },
+      ],
     };
   };
 
   const prepareRadarChartData = () => {
     const filteredData = filterMoodData();
     const moodAverages = moodOptions.reduce((acc, mood) => {
-      const moodEntries = filteredData.filter(entry => entry.mood.value === mood.value);
-      acc[mood.label] = moodEntries.length > 0 ? 
-        moodEntries.reduce((sum, entry) => sum + entry.mood.value, 0) / moodEntries.length : 0;
+      const moodEntries = filteredData.filter(
+        (entry) => entry.mood.value === mood.value
+      );
+      acc[mood.label] =
+        moodEntries.length > 0
+          ? moodEntries.reduce((sum, entry) => sum + entry.mood.value, 0) /
+            moodEntries.length
+          : 0;
       return acc;
     }, {});
 
     return {
       labels: Object.keys(moodAverages),
-      datasets: [{
-        label: 'Mood Intensity',
-        data: Object.values(moodAverages),
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderColor: 'rgb(255, 99, 132)',
-        pointBackgroundColor: 'rgb(255, 99, 132)',
-        pointBorderColor: '#fff',
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgb(255, 99, 132)'
-      }]
+      datasets: [
+        {
+          label: "Mood Intensity",
+          data: Object.values(moodAverages),
+          backgroundColor: "rgba(255, 99, 132, 0.2)",
+          borderColor: "rgb(255, 99, 132)",
+          pointBackgroundColor: "rgb(255, 99, 132)",
+          pointBorderColor: "#fff",
+          pointHoverBackgroundColor: "#fff",
+          pointHoverBorderColor: "rgb(255, 99, 132)",
+        },
+      ],
     };
+  };
+
+  const prepareBarChartData = () => {
+    const filteredData = filterMoodData();
+    const moodCounts = {};
+
+    filteredData.forEach((entry) => {
+      const date = entry.date.toLocaleDateString();
+      if (!moodCounts[date]) {
+        moodCounts[date] = { count: 0, totalValue: 0 };
+      }
+      moodCounts[date].count += 1;
+      moodCounts[date].totalValue += entry.mood.value;
+    });
+
+    const labels = Object.keys(moodCounts);
+    const data = {
+      labels: labels,
+      datasets: [
+        {
+          label: "Average Mood",
+          data: labels.map((date) => moodCounts[date].totalValue / moodCounts[date].count),
+          backgroundColor: "rgba(75, 192, 192, 0.5)",
+        },
+      ],
+    };
+
+    return data;
   };
 
   const chartOptions = {
@@ -179,63 +214,148 @@ const MoodTracker = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'bottom',
+        position: "bottom",
       },
     },
   };
 
   const chartComponents = {
-    line: { component: Line, data: prepareLineChartData, title: "Mood Timeline" },
-    pie: { component: Pie, data: preparePieChartData, title: "Mood Distribution" },
-    heatmap: { 
-      component: CalendarHeatmap, 
-      data: null, 
+    line: {
+      component: Line,
+      data: prepareLineChartData,
+      title: "Mood Timeline",
+    },
+    pie: {
+      component: Pie,
+      data: preparePieChartData,
+      title: "Mood Distribution",
+    },
+    bar: {
+      component: Bar, // Add Bar chart component
+      data: prepareBarChartData, // Use the new data preparation function
+      title: "Mood Bar Chart",
+    },
+    heatmap: {
+      component: CalendarHeatmap,
+      data: null,
       title: "Mood Heatmap",
       props: {
-        values: moodData.map(entry => ({
+        values: moodData.map((entry) => ({
           date: entry.date,
-          count: entry.mood.value
+          count: entry.mood.value,
         })),
         classForValue: (value) => {
-          if (!value) return 'color-empty';
+          if (!value) return "color-empty";
           return `color-scale-${value.count}`; // Fixed string interpolation
-        }
-      }
+        },
+      },
     },
-    radar: { component: Radar, data: prepareRadarChartData, title: "Mood Dimensions" }
+    radar: {
+      component: Radar,
+      data: prepareRadarChartData,
+      title: "Mood Dimensions",
+    },
   };
 
-  const swapChart = (index) => {
-    const availableCharts = Object.keys(chartComponents);
-    const currentIndex = availableCharts.indexOf(displayedCharts[index]);
-    const nextIndex = (currentIndex + 1) % availableCharts.length;
-    const newDisplayedCharts = [...displayedCharts];
-    newDisplayedCharts[index] = availableCharts[nextIndex];
-    setDisplayedCharts(newDisplayedCharts);
-  };
+  
+  useEffect(() => {
+    const fetchMoodData = async () => {
+      if (userId) {
+        const q = query(collection(db, "moods"), where("userId", "==", userId));
+        const querySnapshot = await getDocs(q);
+        const fetchedMoodData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          date: doc.data().date.toDate(), // Convert Firestore Timestamp to Date
+          mood: doc.data().mood,
+          note: doc.data().note,
+          tags: doc.data().tags,
+          userId: doc.data().userId,
+        }));
+        setMoodData(fetchedMoodData); // Set the fetched mood data
+        calculateAverages(fetchedMoodData); // Calculate averages with the fetched data
+      }
+    };
 
+    fetchMoodData(); // Fetch mood data when userId changes
+  }, [userId]); // Dependency on userId
+  
+  useEffect(() => {
+    const fetchUserId = () => {
+      const cognitoUser = userPool.getCurrentUser(); // Get the current user
+      if (cognitoUser) {
+        setUserId(cognitoUser.getUsername()); // Set the userId to the username
+      } else {
+        console.error("No user is currently logged in.");
+      }
+    };
+
+    fetchUserId(); // Call the function to fetch user ID
+  }, []); // Empty dependency array to run once on mount
+
+  const handleMoodSubmit = async () => {
+    if (selectedMood) {
+      const tags = moodNote.match(/#\w+/g) || [];
+      const newCustomTags = tags.filter((tag) => !customTags.includes(tag));
+      
+      const newMoodEntry = {
+        date: new Date(),
+        mood: selectedMood,
+        note: moodNote,
+        tags: tags,
+        userId: userId,
+      };
+      
+      await addDoc(collection(db, "moods"), newMoodEntry);
+      setMoodData([...moodData, newMoodEntry]);
+      setCustomTags([...customTags, ...newCustomTags]);
+      setSelectedMood(null);
+      setMoodNote("");
+    }
+  };
   const calculateAverages = (data) => {
-    const now = new Date();
-    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    if (data.length === 0) return;
 
-    const dailyMoods = data.filter(entry => entry.date.toDateString() === now.toDateString());
-    const weeklyMoods = data.filter(entry => entry.date >= oneWeekAgo);
-    const monthlyMoods = data.filter(entry => entry.date >= oneMonthAgo);
+    const dailyMood = {};
+    const weeklyMood = {};
+    const monthlyMood = {};
 
-    const calculateAverage = (moods) => 
-      moods.reduce((sum, entry) => sum + entry.mood.value, 0) / moods.length || 0;
+    data.forEach(entry => {
+      const date = entry.date.toLocaleDateString();
+      const week = new Date(entry.date).toISOString().slice(0, 10).split('-').slice(0, 2).join('-'); // YYYY-MM
+      const month = new Date(entry.date).toISOString().slice(0, 7); // YYYY-MM
+
+      // Daily average
+      if (!dailyMood[date]) {
+        dailyMood[date] = { total: 0, count: 0 };
+      }
+      dailyMood[date].total += entry.mood.value;
+      dailyMood[date].count += 1;
+
+      // Weekly average
+      if (!weeklyMood[week]) {
+        weeklyMood[week] = { total: 0, count: 0 };
+      }
+      weeklyMood[week].total += entry.mood.value;
+      weeklyMood[week].count += 1;
+
+      // Monthly average
+      if (!monthlyMood[month]) {
+        monthlyMood[month] = { total: 0, count: 0 };
+      }
+      monthlyMood[month].total += entry.mood.value;
+      monthlyMood[month].count += 1;
+    });
+
+    const dailyAverage = Object.values(dailyMood).reduce((acc, curr) => acc + (curr.total / curr.count), 0) / Object.keys(dailyMood).length;
+    const weeklyAverage = Object.values(weeklyMood).reduce((acc, curr) => acc + (curr.total / curr.count), 0) / Object.keys(weeklyMood).length;
+    const monthlyAverage = Object.values(monthlyMood).reduce((acc, curr) => acc + (curr.total / curr.count), 0) / Object.keys(monthlyMood).length;
 
     setMoodAverages({
-      daily: calculateAverage(dailyMoods),
-      weekly: calculateAverage(weeklyMoods),
-      monthly: calculateAverage(monthlyMoods),
+      daily: dailyAverage,
+      weekly: weeklyAverage,
+      monthly: monthlyAverage,
     });
   };
-
-  useEffect(() => {
-    calculateAverages(moodData);
-  }, [moodData]);
 
   return (
     <div className="flex flex-row h-screen bg-gray-100 dark:bg-gray-900">
@@ -260,7 +380,7 @@ const MoodTracker = () => {
                       ? "bg-blue-500 text-white"
                       : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
                   }`}
-                >
+                  >
                   {mood.emoji}
                 </button>
               ))}
@@ -344,8 +464,6 @@ const MoodTracker = () => {
               </div>
             ))}
           </div>
-
-          <MoodInsights moodData={moodData} averages={moodAverages} />
 
           {/* Interactive Mood Diary */}
           <div className="mood-diary mt-8 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">

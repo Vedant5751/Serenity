@@ -3,8 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { CognitoUserPool, AuthenticationDetails, CognitoUser } from 'amazon-cognito-identity-js';
 
 const poolData = {
-  UserPoolId: import.meta.env.VITE_USER_POOL_ID, // Use Vite environment variable
-  ClientId: import.meta.env.VITE_CLIENT_ID, // Use Vite environment variable
+  UserPoolId: import.meta.env.VITE_USER_POOL_ID, 
+  ClientId: import.meta.env.VITE_CLIENT_ID,
 };
 
 const userPool = new CognitoUserPool(poolData);
@@ -15,7 +15,7 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // Use useNavigate for redirection
+  const navigate = useNavigate();
 
   const handleSignIn = (e) => {
     e.preventDefault();
@@ -34,11 +34,11 @@ export default function SignIn() {
 
     user.authenticateUser(authenticationDetails, {
       onSuccess: (result) => {
-        console.log('Sign in successful:', result);
-        localStorage.setItem("isAuthenticated", "true"); // Store authentication status
         navigate("/dashboard"); // Redirect to dashboard on successful sign-in
+        localStorage.setItem("isAuthenticated", "true"); // Store authentication status
       },
       onFailure: (err) => {
+        console.error('Sign in error:', err); // Log the full error object
         setError(err.message);
         setLoading(false);
       },

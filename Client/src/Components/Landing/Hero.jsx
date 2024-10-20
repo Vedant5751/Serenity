@@ -15,9 +15,9 @@ export default function Hero() {
           Track your mood, access resources, and connect with professionals.
         </p>
         <div className="flex flex-col sm:flex-row items-center gap-4 mt-6">
-          <button href="/signup" className="px-4 py-2 bg-slate-500 hover:bg-blue-700 transition duration-200 rounded-lg text-white shadow-[0px_2px_0px_0px_#FFFFFF40_inset]">
+          <a href="/signup" className="px-4 py-2 bg-slate-500 hover:bg-blue-700 transition duration-200 rounded-lg text-white shadow-[0px_2px_0px_0px_#FFFFFF40_inset]">
             Get Started
-          </button>
+          </a>
         </div>
       </Vortex>
     </div>

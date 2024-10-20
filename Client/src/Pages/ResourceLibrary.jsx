@@ -40,6 +40,34 @@ const resources = [
     type: "Infographic",
     link: "/resources/crisis-support",
   },
+  {
+    id: 6,
+    title: "Understanding Depression",
+    category: "Mental Health Education",
+    type: "Article",
+    link: "/resources/understanding-depression",
+  },
+  {
+    id: 7,
+    title: "Yoga for Stress Relief",
+    category: "Physical Wellness",
+    type: "Video",
+    link: "/resources/yoga-for-stress-relief",
+  },
+  {
+    id: 8,
+    title: "Building Resilience",
+    category: "Personal Development",
+    type: "Podcast",
+    link: "/resources/building-resilience",
+  },
+  {
+    id: 9,
+    title: "Mental Health Myths Debunked",
+    category: "Mental Health Awareness",
+    type: "Infographic",
+    link: "/resources/mental-health-myths-debunked",
+  },
 ];
 
 const ResourceLibrary = () => {
