@@ -12,13 +12,16 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion"; 
 import { cn } from "/src/lib/utils";
+import { useAuth } from "../Components/AuthContext"; // Import the useAuth hook
 
 
 export default function SidebarDemo() {
   const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const { logout } = useAuth(); // Get the logout function from context
 
   const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated"); // Clear authentication status
+    logout(); // Call the logout function from context
     navigate("/signin"); // Redirect to sign-in page
   };
 
